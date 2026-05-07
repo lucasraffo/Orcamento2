@@ -98,150 +98,179 @@ export default function Dashboard() {
   const totalServicos = servicos.reduce((acc, serv) => acc + serv.valor, 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto p-6">
+    <div className="relative min-h-screen">
+      {/* Background futurístico com ar condicionado */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950" />
+        
+        {/* Efeito de nebulosa/nitrogênio líquido */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}} />
+        <div className="absolute top-1/2 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}} />
+      </div>
+
+      <div className="relative z-10 container mx-auto p-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Raffo Refrigeração</h1>
-          <p className="text-gray-600">CNPJ: 27.966.710/0001-27</p>
-          <p className="text-gray-600">Sistema de Orçamentos e Serviços</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
+            Raffo Refrigeração
+          </h1>
+          <p className="text-slate-400">CNPJ: 27.966.710/0001-27</p>
+          <p className="text-slate-400">Sistema de Orçamentos e Serviços</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="novo-orcamento">Novo Orçamento</TabsTrigger>
-            <TabsTrigger value="orcamentos">Orçamentos</TabsTrigger>
-            <TabsTrigger value="novo-servico">Novo Serviço</TabsTrigger>
-            <TabsTrigger value="servicos">Serviços</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 bg-slate-900/50 border border-slate-700">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">Dashboard</TabsTrigger>
+            <TabsTrigger value="novo-orcamento" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">Novo Orçamento</TabsTrigger>
+            <TabsTrigger value="orcamentos" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">Orçamentos</TabsTrigger>
+            <TabsTrigger value="novo-servico" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">Novo Serviço</TabsTrigger>
+            <TabsTrigger value="servicos" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">Serviços feitos</TabsTrigger>
           </TabsList>
+
+          <style>{`
+            @keyframes shimmer {
+              0%, 100% {
+                opacity: 1;
+              }
+              50% {
+                opacity: 0.7;
+              }
+            }
+
+            .card-futuristic {
+              background: rgba(15, 23, 42, 0.7);
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(34, 211, 238, 0.2);
+              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(148, 163, 184, 0.1);
+              transition: all 0.3s ease;
+            }
+
+            .card-futuristic:hover {
+              border: 1px solid rgba(34, 211, 238, 0.5);
+              box-shadow: 0 8px 32px rgba(34, 211, 238, 0.2), inset 0 1px 1px rgba(148, 163, 184, 0.2);
+              transform: translateY(-2px);
+            }
+          `}</style>
 
           <TabsContent value="dashboard" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Orçamentos</CardTitle>
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{orcamentos.length}</div>
-                  <p className="text-xs text-muted-foreground">
-                    R$ {totalOrcamentos.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="card-futuristic rounded-xl p-6">
+                <div className="flex flex-row items-center justify-between space-y-0">
+                  <div>
+                    <p className="text-sm font-medium text-slate-400">Total Orçamentos</p>
+                    <div className="text-2xl font-bold text-white mt-2">{orcamentos.length}</div>
+                    <p className="text-xs text-cyan-400 mt-1">
+                      R$ {totalOrcamentos.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <FileText className="h-8 w-8 text-cyan-400/50" />
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Serviços</CardTitle>
-                  <Wrench className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{servicos.length}</div>
-                  <p className="text-xs text-muted-foreground">
-                    R$ {totalServicos.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="card-futuristic rounded-xl p-6">
+                <div className="flex flex-row items-center justify-between space-y-0">
+                  <div>
+                    <p className="text-sm font-medium text-slate-400">Serviços feitos</p>
+                    <div className="text-2xl font-bold text-white mt-2">{servicos.length}</div>
+                    <p className="text-xs text-cyan-400 mt-1">
+                      R$ {totalServicos.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <Wrench className="h-8 w-8 text-cyan-400/50" />
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Aprovados</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{orcamentos.filter((o) => o.status === "aprovado").length}</div>
-                  <p className="text-xs text-muted-foreground">Orçamentos aprovados</p>
-                </CardContent>
-              </Card>
+              <div className="card-futuristic rounded-xl p-6">
+                <div className="flex flex-row items-center justify-between space-y-0">
+                  <div>
+                    <p className="text-sm font-medium text-slate-400">Aprovados</p>
+                    <div className="text-2xl font-bold text-white mt-2">{orcamentos.filter((o) => o.status === "aprovado").length}</div>
+                    <p className="text-xs text-slate-500 mt-1">Orçamentos aprovados</p>
+                  </div>
+                  <DollarSign className="h-8 w-8 text-green-400/50" />
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Concluídos</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{servicos.filter((s) => s.status === "concluido").length}</div>
-                  <p className="text-xs text-muted-foreground">Serviços concluídos</p>
-                </CardContent>
-              </Card>
+              <div className="card-futuristic rounded-xl p-6">
+                <div className="flex flex-row items-center justify-between space-y-0">
+                  <div>
+                    <p className="text-sm font-medium text-slate-400">Concluídos</p>
+                    <div className="text-2xl font-bold text-white mt-2">{servicos.filter((s) => s.status === "concluido").length}</div>
+                    <p className="text-xs text-slate-500 mt-1">Serviços concluídos</p>
+                  </div>
+                  <Users className="h-8 w-8 text-blue-400/50" />
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Orçamentos Recentes</CardTitle>
-                  <CardDescription>Últimos orçamentos criados</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {orcamentos
-                      .slice(-5)
-                      .reverse()
-                      .map((orcamento) => (
-                        <div key={orcamento.id} className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">{orcamento.cliente}</p>
-                            <p className="text-sm text-gray-500">{orcamento.data}</p>
+              <div className="card-futuristic rounded-xl p-6">
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold text-white">Orçamentos Recentes</h3>
+                  <p className="text-sm text-slate-400">Últimos orçamentos criados</p>
+                </div>
+                <div className="space-y-4">
+                  {orcamentos
+                    .slice(-5)
+                    .reverse()
+                    .map((orcamento) => (
+                      <div key={orcamento.id} className="flex items-center justify-between pb-4 border-b border-slate-700 last:border-0">
+                        <div>
+                          <p className="font-medium text-white">{orcamento.cliente}</p>
+                          <p className="text-sm text-slate-500">{orcamento.data}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium text-cyan-400">
+                            R$ {orcamento.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                          </p>
+                          <div className={`inline-block px-2 py-1 rounded text-xs font-semibold mt-1 ${
+                            orcamento.status === "aprovado"
+                              ? "bg-green-500/20 text-green-300"
+                              : orcamento.status === "rejeitado"
+                                ? "bg-red-500/20 text-red-300"
+                                : "bg-yellow-500/20 text-yellow-300"
+                          }`}>
+                            {orcamento.status}
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium">
-                              R$ {orcamento.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                            </p>
-                            <Badge
-                              variant={
-                                orcamento.status === "aprovado"
-                                  ? "default"
-                                  : orcamento.status === "rejeitado"
-                                    ? "destructive"
-                                    : "secondary"
-                              }
-                            >
-                              {orcamento.status}
-                            </Badge>
                           </div>
                         </div>
                       ))}
                   </div>
-                </CardContent>
-              </Card>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Serviços Recentes</CardTitle>
-                  <CardDescription>Últimos serviços cadastrados</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {servicos
-                      .slice(-5)
-                      .reverse()
-                      .map((servico) => (
-                        <div key={servico.id} className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">{servico.cliente}</p>
-                            <p className="text-sm text-gray-500">{servico.data}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">
-                              R$ {servico.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                            </p>
-                            <Badge
-                              variant={
-                                servico.status === "concluido"
-                                  ? "default"
-                                  : servico.status === "cancelado"
-                                    ? "destructive"
-                                    : "secondary"
-                              }
-                            >
-                              {servico.status.replace("_", " ")}
-                            </Badge>
+              <div className="card-futuristic rounded-xl p-6">
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold text-white">Serviços Recentes</h3>
+                  <p className="text-sm text-slate-400">Últimos serviços cadastrados</p>
+                </div>
+                <div className="space-y-4">
+                  {servicos
+                    .slice(-5)
+                    .reverse()
+                    .map((servico) => (
+                      <div key={servico.id} className="flex items-center justify-between pb-4 border-b border-slate-700 last:border-0">
+                        <div>
+                          <p className="font-medium text-white">{servico.cliente}</p>
+                          <p className="text-sm text-slate-500">{servico.data}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium text-cyan-400">
+                            R$ {servico.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                          </p>
+                          <div className={`inline-block px-2 py-1 rounded text-xs font-semibold mt-1 ${
+                            servico.status === "concluido"
+                              ? "bg-green-500/20 text-green-300"
+                              : servico.status === "cancelado"
+                                ? "bg-red-500/20 text-red-300"
+                                : "bg-blue-500/20 text-blue-300"
+                          }`}>
+                            {servico.status.replace("_", " ")}
                           </div>
                         </div>
-                      ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
           </TabsContent>
 
