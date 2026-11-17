@@ -4,9 +4,20 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Wrench, ShieldCheck, Send } from "lucide-react"
+import { Wrench, ShieldCheck, Send, Trash2 } from "lucide-react"
 import { gerarGarantiaPDF } from "../utils/pdf-generator"
 import { enviarWhatsAppGarantia } from "../utils/whatsapp"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface Servico {
   id: string
@@ -23,9 +34,10 @@ interface Servico {
 interface ListaServicosProps {
   servicos: Servico[]
   onUpdateStatus: (id: string, status: Servico["status"]) => void
+  onDelete: (id: string) => void
 }
 
-export function ListaServicos({ servicos, onUpdateStatus }: ListaServicosProps) {
+export function ListaServicos({ servicos, onUpdateStatus, onDelete }: ListaServicosProps) {
   const handleGerarGarantiaPDF = async (servico: Servico) => {
     try {
       await gerarGarantiaPDF(servico)
@@ -225,6 +237,37 @@ export function ListaServicos({ servicos, onUpdateStatus }: ListaServicosProps) 
                         <Send className="h-4 w-4 mr-2" />
                         WhatsApp
                       </Button>
+                      {servico.status === "cancelado" && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              aria-label={`Excluir serviço de ${servico.cliente}`}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Excluir
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Excluir serviço?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                O serviço de {servico.cliente} será removido permanentemente. Essa ação não pode ser desfeita.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => onDelete(servico.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Excluir serviço
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   </div>
                 </div>
