@@ -80,6 +80,7 @@ interface Servico {
   descricao: string
   status: string
   data: string
+  dataServico?: string
   valor: number
   tecnico: string
   dataConclusao?: string
@@ -88,12 +89,14 @@ interface Servico {
 export function enviarWhatsAppGarantia(servico: Servico) {
   const dataConclusao = formatarData(servico.dataConclusao)
   const fimGarantia = formatarData(somarDiasAData(servico.dataConclusao, 90))
+  const dataServico = formatarData(servico.dataServico)
   const mensagem = `
 🧊 *RAFFO REFRIGERAÇÃO* 🧊
 CNPJ: 27.966.710/0001-27
 
 🛡️ *GARANTIA DO SERVIÇO #${servico.id}*
 📅 Data: ${servico.data}
+${dataServico ? `🗓️ Data do serviço: ${dataServico}\n` : ""}
 ${dataConclusao ? `✅ Serviço concluído em: ${dataConclusao}\n🛡️ Garantia até: ${fimGarantia}\n` : ""}
 
 👤 *CLIENTE:*

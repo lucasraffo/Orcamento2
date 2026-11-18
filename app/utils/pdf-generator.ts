@@ -19,193 +19,419 @@ interface Orcamento {
 }
 
 export async function gerarPDF(orcamento: Orcamento) {
-  // Criar conteúdo HTML para o PDF
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Orçamento - ${orcamento.cliente}</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 20px;
-          color: #333;
-        }
-        .header {
-          text-align: center;
-          border-bottom: 2px solid #0066cc;
-          padding-bottom: 20px;
-          margin-bottom: 30px;
-        }
-        .company-name {
-          font-size: 28px;
-          font-weight: bold;
-          color: #0066cc;
-          margin-bottom: 5px;
-        }
-        .company-info {
-          font-size: 14px;
-          color: #666;
-        }
-        .orcamento-info {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 30px;
-        }
-        .cliente-info, .orcamento-details {
-          width: 48%;
-        }
-        .section-title {
-          font-size: 16px;
-          font-weight: bold;
-          color: #0066cc;
-          margin-bottom: 10px;
-          border-bottom: 1px solid #ddd;
-          padding-bottom: 5px;
-        }
-        .info-line {
-          margin-bottom: 8px;
-          font-size: 14px;
-        }
-        .info-label {
-          font-weight: bold;
-          display: inline-block;
-          width: 80px;
-        }
-        .itens-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 20px 0;
-        }
-        .itens-table th,
-        .itens-table td {
-          border: 1px solid #ddd;
-          padding: 12px;
-          text-align: left;
-        }
-        .itens-table th {
-          background-color: #f8f9fa;
-          font-weight: bold;
-          color: #0066cc;
-        }
-        .itens-table .text-right {
-          text-align: right;
-        }
-        .total-section {
-          margin-top: 30px;
-          text-align: right;
-        }
-        .total-value {
-          font-size: 24px;
-          font-weight: bold;
-          color: #28a745;
-          margin-top: 10px;
-        }
-        .footer {
-          margin-top: 50px;
-          padding-top: 20px;
-          border-top: 1px solid #ddd;
-          text-align: center;
-          font-size: 12px;
-          color: #666;
-        }
-        .description {
-          margin: 20px 0;
-          padding: 15px;
-          background-color: #f8f9fa;
-          border-left: 4px solid #0066cc;
-        }
-        @media print {
-          body { margin: 0; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div class="company-name">RAFFO REFRIGERAÇÃO</div>
-        <div class="company-info">
-          CNPJ: 27.966.710/0001-27<br>
-          Especializada em Refrigeração e Climatização
-        </div>
-      </div>
-
-      <div class="orcamento-info">
-        <div class="cliente-info">
-          <div class="section-title">DADOS DO CLIENTE</div>
-          <div class="info-line">
-            <span class="info-label">Nome:</span> ${orcamento.cliente}
-          </div>
-          ${orcamento.telefone ? `<div class="info-line"><span class="info-label">Telefone:</span> ${orcamento.telefone}</div>` : ""}
-          <div class="info-line">
-            <span class="info-label">Email:</span> ${orcamento.email || "Não informado"}
-          </div>
-          <div class="info-line">
-            <span class="info-label">Endereço:</span> ${orcamento.endereco}
-          </div>
-        </div>
-        
-        <div class="orcamento-details">
-          <div class="section-title">DADOS DO ORÇAMENTO</div>
-          <div class="info-line">
-            <span class="info-label">Número:</span> #${orcamento.id}
-          </div>
-          <div class="info-line">
-            <span class="info-label">Criado em:</span> ${orcamento.data}
-          </div>
-          <div class="info-line">
-            <span class="info-label">Status:</span> ${orcamento.status.toUpperCase()}
-          </div>
-        </div>
-      </div>
-
-      ${
-        orcamento.descricao
-          ? `
-        <div class="description">
-          <div class="section-title">DESCRIÇÃO DO SERVIÇO</div>
-          <p>${orcamento.descricao}</p>
-        </div>
-      `
-          : ""
-      }
-
-      <div class="section-title">ITENS DO ORÇAMENTO</div>
-      <table class="itens-table">
-        <thead>
-          <tr>
-            <th>Descrição</th>
-            <th class="text-right">Qtd</th>
-            <th class="text-right">Valor Unit.</th>
-            <th class="text-right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${orcamento.itens
-            .map(
-              (item) => `
+  const cliente = escaparHtml(orcamento.cliente)
+  const telefone = escaparHtml(orcamento.telefone)
+  const email = escaparHtml(orcamento.email || "Não informado")
+  const endereco = escaparHtml(orcamento.endereco)
+  const descricao = escaparHtml(orcamento.descricao)
+  const numeroOrcamento = escaparHtml(orcamento.id)
+  const dataCriacao = formatarData(orcamento.data) ?? escaparHtml(orcamento.data)
+  const status = escaparHtml(orcamento.status.toUpperCase())
+  const statusClass =
+    orcamento.status === "aprovado"
+      ? "approved"
+      : orcamento.status === "rejeitado"
+        ? "rejected"
+        : "pending"
+  const validadeAte = formatarData(somarDiasAData(orcamento.data, 7))
+  const itens = orcamento.itens.length
+    ? orcamento.itens
+        .map(
+          (item) => `
             <tr>
-              <td>${item.descricao}</td>
+              <td>${escaparHtml(item.descricao)}</td>
               <td class="text-right">${item.quantidade}</td>
               <td class="text-right">R$ ${item.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
               <td class="text-right">R$ ${(item.quantidade * item.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
             </tr>
           `,
-            )
-            .join("")}
-        </tbody>
-      </table>
+        )
+        .join("")
+    : `<tr><td colspan="4" class="empty-items">Nenhum item informado</td></tr>`
 
-      <div class="total-section">
-        <div class="section-title">VALOR TOTAL</div>
-        <div class="total-value">R$ ${orcamento.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
-      </div>
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Orçamento #${numeroOrcamento} - ${cliente}</title>
+      <style>
+        @page {
+          size: A4;
+          margin: 15mm;
+        }
 
-      <div class="footer">
-        <p>Este orçamento foi criado em ${orcamento.data}. Os valores são válidos por 7 dias; após esse prazo, poderão sofrer alteração.</p>
-        <p>Raffo Refrigeração - Soluções em Refrigeração e Climatização</p>
-      </div>
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          padding: 32px 16px;
+          background: #e8eef5;
+          color: #172033;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 13px;
+          line-height: 1.55;
+        }
+
+        .document {
+          width: 100%;
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 42px 48px;
+          background: #fff;
+          border: 1px solid #dbe4ef;
+          border-radius: 12px;
+          box-shadow: 0 16px 48px rgba(15, 35, 65, 0.12);
+        }
+
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          padding-bottom: 24px;
+          border-bottom: 2px solid #0877c9;
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .brand-mark {
+          display: grid;
+          width: 48px;
+          height: 48px;
+          place-items: center;
+          border-radius: 12px;
+          background: #e7f3ff;
+          color: #0867b2;
+          font-size: 18px;
+          font-weight: 800;
+        }
+
+        .company-name {
+          margin: 0;
+          color: #075da8;
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: 0.3px;
+        }
+
+        .company-info {
+          margin-top: 3px;
+          color: #637187;
+          font-size: 11px;
+        }
+
+        .validity-badge {
+          flex: 0 0 auto;
+          padding: 9px 13px;
+          border: 1px solid #cfe3f4;
+          border-radius: 999px;
+          background: #f1f8fe;
+          color: #075da8;
+          font-size: 11px;
+          font-weight: 700;
+          text-align: center;
+        }
+
+        .document-info {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin: 24px 0;
+          padding: 14px 16px;
+          border-radius: 8px;
+          background: #f1f7fc;
+        }
+
+        .document-info span,
+        .detail-label {
+          display: block;
+          color: #69788d;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.7px;
+          text-transform: uppercase;
+        }
+
+        .document-info strong {
+          color: #075da8;
+          font-size: 16px;
+        }
+
+        .status {
+          display: inline-block;
+          padding: 5px 9px;
+          border-radius: 999px;
+          font-size: 10px !important;
+          letter-spacing: 0.3px;
+        }
+
+        .status.approved {
+          background: #edf9f1;
+          color: #197044;
+        }
+
+        .status.rejected {
+          background: #fff0f0;
+          color: #b42318;
+        }
+
+        .status.pending {
+          background: #fff8e6;
+          color: #936500;
+        }
+
+        .section {
+          margin-top: 24px;
+          break-inside: avoid;
+        }
+
+        .section-title {
+          margin: 0 0 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid #dce5ef;
+          color: #075da8;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.6px;
+          text-transform: uppercase;
+        }
+
+        .details-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px 20px;
+        }
+
+        .detail-value {
+          display: block;
+          margin-top: 3px;
+          overflow-wrap: anywhere;
+          color: #172033;
+          font-size: 13px;
+          font-weight: 600;
+        }
+
+        .description {
+          min-height: 54px;
+          padding: 14px 16px;
+          border-left: 3px solid #1684d4;
+          border-radius: 0 6px 6px 0;
+          background: #f5f8fb;
+          overflow-wrap: anywhere;
+          white-space: pre-wrap;
+        }
+
+        .itens-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 0;
+        }
+
+        .itens-table th,
+        .itens-table td {
+          padding: 11px 12px;
+          border-bottom: 1px solid #dce5ef;
+          text-align: left;
+          overflow-wrap: anywhere;
+        }
+
+        .itens-table th {
+          background: #f1f7fc;
+          color: #075da8;
+          font-weight: 700;
+        }
+
+        .itens-table .text-right {
+          text-align: right;
+        }
+
+        .itens-table tr {
+          break-inside: avoid;
+        }
+
+        .empty-items {
+          color: #69788d;
+          text-align: center !important;
+        }
+
+        .total-section {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 16px;
+          padding: 16px;
+          border: 1px solid #dce5ef;
+          border-radius: 8px;
+        }
+
+        .total-value {
+          color: #167344;
+          font-size: 21px;
+          font-weight: 800;
+        }
+
+        .validity-note {
+          padding: 14px 16px;
+          border: 1px solid #cfe3f4;
+          border-radius: 8px;
+          background: #f1f8fe;
+          color: #34445a;
+          break-inside: avoid;
+        }
+
+        .validity-note strong {
+          color: #075da8;
+        }
+
+        .footer {
+          margin-top: 28px;
+          padding-top: 14px;
+          border-top: 1px solid #dce5ef;
+          color: #69788d;
+          font-size: 10px;
+          text-align: center;
+        }
+
+        .footer p {
+          margin: 3px 0;
+        }
+
+        @media print {
+          body {
+            padding: 0;
+            background: #fff;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+
+          .document {
+            max-width: none;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .document {
+            padding: 24px;
+          }
+
+          .header {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .details-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <main class="document">
+        <header class="header">
+          <div class="brand">
+            <div class="brand-mark">RR</div>
+            <div>
+              <h1 class="company-name">RAFFO REFRIGERAÇÃO</h1>
+              <div class="company-info">
+                CNPJ: 27.966.710/0001-27<br>
+                Soluções em Refrigeração e Climatização
+              </div>
+            </div>
+          </div>
+          <div class="validity-badge">ORÇAMENTO<br>VALIDADE DE 7 DIAS</div>
+        </header>
+
+        <div class="document-info">
+          <div>
+            <span>Orçamento</span>
+            <strong>Documento nº #${numeroOrcamento}</strong>
+          </div>
+          <div>
+            <span>Criado em</span>
+            <strong>${dataCriacao}</strong>
+          </div>
+          <div>
+            <span>Status</span>
+            <strong class="status ${statusClass}">${status}</strong>
+          </div>
+        </div>
+
+        <section class="section">
+          <h2 class="section-title">Dados do cliente</h2>
+          <div class="details-grid">
+            <div>
+              <span class="detail-label">Cliente</span>
+              <strong class="detail-value">${cliente}</strong>
+            </div>
+            ${telefone ? `<div><span class="detail-label">Telefone</span><strong class="detail-value">${telefone}</strong></div>` : ""}
+            <div>
+              <span class="detail-label">E-mail</span>
+              <strong class="detail-value">${email}</strong>
+            </div>
+            <div>
+              <span class="detail-label">Endereço</span>
+              <strong class="detail-value">${endereco}</strong>
+            </div>
+          </div>
+        </section>
+
+        ${
+          descricao
+            ? `<section class="section">
+                <h2 class="section-title">Descrição do serviço</h2>
+                <div class="description">${descricao}</div>
+              </section>`
+            : ""
+        }
+
+        <section class="section">
+          <h2 class="section-title">Itens do orçamento</h2>
+          <table class="itens-table">
+            <thead>
+              <tr>
+                <th>Descrição</th>
+                <th class="text-right">Qtd.</th>
+                <th class="text-right">Valor unitário</th>
+                <th class="text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>${itens}</tbody>
+          </table>
+          <div class="total-section">
+            <span class="detail-label">Valor total</span>
+            <strong class="total-value">R$ ${orcamento.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong>
+          </div>
+        </section>
+
+        <section class="section validity-note">
+          <strong>Validade e atualização de valores</strong>
+          <p>
+            Os valores deste orçamento são válidos por 7 dias a partir da criação
+            (${dataCriacao})${
+              validadeAte ? `, até ${validadeAte}` : ""
+            }. Após esse prazo, os valores poderão sofrer alteração.
+          </p>
+        </section>
+
+        <footer class="footer">
+          <p>Raffo Refrigeração · CNPJ 27.966.710/0001-27</p>
+          <p>Este orçamento refere-se exclusivamente ao documento nº #${numeroOrcamento}.</p>
+        </footer>
+      </main>
     </body>
     </html>
   `
@@ -244,6 +470,7 @@ interface Servico {
   descricao: string
   status: string
   data: string
+  dataServico?: string
   dataConclusao?: string
   valor: number
   tecnico: string
@@ -270,6 +497,7 @@ export async function gerarGarantiaPDF(servico: Servico) {
   const descricao = escaparHtml(servico.descricao)
   const tecnico = escaparHtml(servico.tecnico)
   const data = escaparHtml(servico.data)
+  const dataServico = formatarData(servico.dataServico)
   const dataConclusao =
     servico.status === "concluido" ? formatarData(servico.dataConclusao) : null
   const fimGarantia = dataConclusao
@@ -562,9 +790,17 @@ export async function gerarGarantiaPDF(servico: Servico) {
               <strong class="detail-value">${tecnico}</strong>
             </div>
             <div>
-              <span class="detail-label">Data registrada</span>
+              <span class="detail-label">Cadastrado em</span>
               <strong class="detail-value">${data}</strong>
             </div>
+            ${
+              dataServico
+                ? `<div>
+                    <span class="detail-label">Data do serviço</span>
+                    <strong class="detail-value">${escaparHtml(dataServico)}</strong>
+                  </div>`
+                : ""
+            }
             ${
               dataConclusao
                 ? `<div>
