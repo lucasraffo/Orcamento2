@@ -17,6 +17,7 @@ interface ServicoData {
   status: "agendado" | "em_andamento" | "concluido" | "cancelado"
   valor: number
   tecnico: string
+  dataConclusao?: string
 }
 
 interface ServicoFormProps {
@@ -32,6 +33,7 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
   const [descricao, setDescricao] = useState(initialData?.descricao ?? "")
   const [valor, setValor] = useState(initialData?.valor ?? 0)
   const [tecnico, setTecnico] = useState(initialData?.tecnico ?? "")
+  const [dataConclusao, setDataConclusao] = useState(initialData?.dataConclusao ?? "")
 
   const resetForm = () => {
     setCliente("")
@@ -40,6 +42,7 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
     setDescricao("")
     setValor(0)
     setTecnico("")
+    setDataConclusao("")
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,6 +61,10 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
       status: initialData?.status ?? "agendado",
       valor,
       tecnico,
+      dataConclusao:
+        initialData?.status === "concluido" && dataConclusao
+          ? dataConclusao
+          : undefined,
     })
 
     if (initialData) {
@@ -238,6 +245,22 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
               </Select>
             </div>
           </div>
+
+          {initialData?.status === "concluido" && (
+            <div className="space-y-2">
+              <Label htmlFor="dataConclusao" className="text-slate-300">Data de conclusão</Label>
+              <Input
+                id="dataConclusao"
+                type="date"
+                value={dataConclusao}
+                onChange={(e) => setDataConclusao(e.target.value)}
+                className="bg-slate-900/50 border-slate-700 text-white"
+              />
+              <p className="text-xs text-slate-400">
+                Informe a data em que o serviço foi concluído para calcular o prazo da garantia.
+              </p>
+            </div>
+          )}
 
           <div className={onCancel ? "flex gap-3" : ""}>
             {onCancel && (

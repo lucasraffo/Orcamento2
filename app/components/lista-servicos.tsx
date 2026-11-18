@@ -9,6 +9,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Wrench, ShieldCheck, Send, Pencil } from "lucide-react"
 import { gerarGarantiaPDF } from "../utils/pdf-generator"
 import { enviarWhatsAppGarantia } from "../utils/whatsapp"
+import { formatarData, somarDiasAData } from "../utils/date-utils"
 import { ServicoForm } from "./servico-form"
 
 interface Servico {
@@ -19,6 +20,7 @@ interface Servico {
   descricao: string
   status: "agendado" | "em_andamento" | "concluido" | "cancelado"
   data: string
+  dataConclusao?: string
   valor: number
   tecnico: string
 }
@@ -193,6 +195,19 @@ export function ListaServicos({ servicos, onUpdateStatus, onUpdate }: ListaServi
                       <span className="text-slate-400">Descrição:</span>
                       <p className="text-slate-300 mt-1">{servico.descricao}</p>
                     </div>
+                    {servico.status === "concluido" && (
+                      <div className="text-sm">
+                        <span className="text-slate-400">Serviço concluído em:</span>
+                        <p className="text-white">
+                          {formatarData(servico.dataConclusao) ?? "Data de conclusão não informada"}
+                        </p>
+                        <span className="text-slate-400">Garantia de 90 dias até:</span>
+                        <p className="text-white">
+                          {formatarData(somarDiasAData(servico.dataConclusao, 90)) ??
+                            "Informe a data de conclusão ao editar o serviço"}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-between items-center">
