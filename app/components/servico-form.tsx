@@ -21,15 +21,17 @@ interface ServicoData {
 
 interface ServicoFormProps {
   onSubmit: (servico: ServicoData) => void
+  initialData?: ServicoData
+  onCancel?: () => void
 }
 
-export function ServicoForm({ onSubmit }: ServicoFormProps) {
-  const [cliente, setCliente] = useState("")
-  const [telefone, setTelefone] = useState("")
-  const [endereco, setEndereco] = useState("")
-  const [descricao, setDescricao] = useState("")
-  const [valor, setValor] = useState(0)
-  const [tecnico, setTecnico] = useState("")
+export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProps) {
+  const [cliente, setCliente] = useState(initialData?.cliente ?? "")
+  const [telefone, setTelefone] = useState(initialData?.telefone ?? "")
+  const [endereco, setEndereco] = useState(initialData?.endereco ?? "")
+  const [descricao, setDescricao] = useState(initialData?.descricao ?? "")
+  const [valor, setValor] = useState(initialData?.valor ?? 0)
+  const [tecnico, setTecnico] = useState(initialData?.tecnico ?? "")
 
   const resetForm = () => {
     setCliente("")
@@ -53,10 +55,15 @@ export function ServicoForm({ onSubmit }: ServicoFormProps) {
       telefone,
       endereco,
       descricao,
-      status: "agendado",
+      status: initialData?.status ?? "agendado",
       valor,
       tecnico,
     })
+
+    if (initialData) {
+      alert("Serviço atualizado com sucesso!")
+      return
+    }
 
     resetForm()
     alert("Serviço cadastrado com sucesso!")
@@ -146,8 +153,12 @@ export function ServicoForm({ onSubmit }: ServicoFormProps) {
       <div className="relative z-10 p-6 max-w-2xl mx-auto">
         <Card className="card-futuristic border-0">
           <CardHeader>
-            <CardTitle className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Novo Serviço</CardTitle>
-            <CardDescription className="text-slate-400">Cadastre um novo serviço a ser prestado</CardDescription>
+            <CardTitle className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              {initialData ? "Editar Serviço" : "Novo Serviço"}
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              {initialData ? "Atualize os dados deste serviço" : "Cadastre um novo serviço a ser prestado"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -228,9 +239,16 @@ export function ServicoForm({ onSubmit }: ServicoFormProps) {
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" size="lg">
-            Cadastrar Serviço
-          </Button>
+          <div className={onCancel ? "flex gap-3" : ""}>
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+                Cancelar
+              </Button>
+            )}
+            <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" size="lg">
+              {initialData ? "Salvar Alterações" : "Cadastrar Serviço"}
+            </Button>
+          </div>
         </form>
           </CardContent>
         </Card>

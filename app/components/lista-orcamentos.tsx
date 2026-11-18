@@ -1,12 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FileText, Send, Download } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { FileText, Send, Download, Pencil, Trash2 } from "lucide-react"
 import { gerarPDF } from "../utils/pdf-generator"
 import { enviarWhatsApp } from "../utils/whatsapp"
+import { OrcamentoForm } from "./orcamento-form"
 
 interface Orcamento {
   id: string
@@ -28,9 +31,13 @@ interface Orcamento {
 interface ListaOrcamentosProps {
   orcamentos: Orcamento[]
   onUpdateStatus: (id: string, status: Orcamento["status"]) => void
+  onUpdate: (id: string, orcamento: Omit<Orcamento, "id" | "data">) => void
+  onDelete: (id: string) => void
 }
 
-export function ListaOrcamentos({ orcamentos, onUpdateStatus }: ListaOrcamentosProps) {
+export function ListaOrcamentos({ orcamentos, onUpdateStatus, onUpdate, onDelete }: ListaOrcamentosProps) {
+  const [orcamentoEditando, setOrcamentoEditando] = useState<Orcamento | null>(null)
+
   const handleGerarPDF = async (orcamento: Orcamento) => {
     try {
       await gerarPDF(orcamento)
@@ -42,6 +49,12 @@ export function ListaOrcamentos({ orcamentos, onUpdateStatus }: ListaOrcamentosP
 
   const handleEnviarWhatsApp = (orcamento: Orcamento) => {
     enviarWhatsApp(orcamento)
+  }
+
+  const handleExcluir = (orcamento: Orcamento) => {
+    if (window.confirm(`Deseja excluir o orçamento de ${orcamento.cliente}?`)) {
+      onDelete(orcamento.id)
+    }
   }
 
   return (
@@ -216,7 +229,7 @@ export function ListaOrcamentos({ orcamentos, onUpdateStatus }: ListaOrcamentosP
                     <div className="text-2xl font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
                       R$ {orcamento.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                       <Select
                         value={orcamento.status}
                         onValueChange={(value) => onUpdateStatus(orcamento.id, value as Orcamento["status"])}
@@ -247,6 +260,26 @@ export function ListaOrcamentos({ orcamentos, onUpdateStatus }: ListaOrcamentosP
                         <Send className="h-4 w-4 mr-2" />
                         WhatsApp
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setOrcamentoEditando(orcamento)}
+                        className="bg-slate-900/50 border-slate-700 text-cyan-400 hover:bg-slate-800 hover:border-cyan-500/50 hover:text-cyan-300"
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
+                      {orcamento.status === "rejeitado" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleExcluir(orcamento)}
+                          className="bg-red-600/20 border-red-500/50 text-red-300 hover:bg-red-600/40 hover:text-red-200"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Excluir
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -255,6 +288,26 @@ export function ListaOrcamentos({ orcamentos, onUpdateStatus }: ListaOrcamentosP
           )}
         </div>
       </div>
+      <Dialog
+        open={orcamentoEditando !== null}
+        onOpenChange={(open) => {
+          if (!open) setOrcamentoEditando(null)
+        }}
+      >
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto border-slate-700 bg-slate-950 p-0">
+          {orcamentoEditando && (
+            <OrcamentoForm
+              key={orcamentoEditando.id}
+              initialData={orcamentoEditando}
+              onCancel={() => setOrcamentoEditando(null)}
+              onSubmit={(dados) => {
+                onUpdate(orcamentoEditando.id, dados)
+                setOrcamentoEditando(null)
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

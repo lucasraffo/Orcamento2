@@ -1,12 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Wrench, ShieldCheck, Send } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Wrench, ShieldCheck, Send, Pencil } from "lucide-react"
 import { gerarGarantiaPDF } from "../utils/pdf-generator"
 import { enviarWhatsAppGarantia } from "../utils/whatsapp"
+import { ServicoForm } from "./servico-form"
 
 interface Servico {
   id: string
@@ -23,9 +26,12 @@ interface Servico {
 interface ListaServicosProps {
   servicos: Servico[]
   onUpdateStatus: (id: string, status: Servico["status"]) => void
+  onUpdate: (id: string, servico: Omit<Servico, "id" | "data">) => void
 }
 
-export function ListaServicos({ servicos, onUpdateStatus }: ListaServicosProps) {
+export function ListaServicos({ servicos, onUpdateStatus, onUpdate }: ListaServicosProps) {
+  const [servicoEditando, setServicoEditando] = useState<Servico | null>(null)
+
   const handleGerarGarantiaPDF = async (servico: Servico) => {
     try {
       await gerarGarantiaPDF(servico)
@@ -193,7 +199,7 @@ export function ListaServicos({ servicos, onUpdateStatus }: ListaServicosProps) 
                     <div className="text-2xl font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
                       R$ {servico.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                       <Select
                         value={servico.status}
                         onValueChange={(value) => onUpdateStatus(servico.id, value as Servico["status"])}
@@ -225,6 +231,15 @@ export function ListaServicos({ servicos, onUpdateStatus }: ListaServicosProps) 
                         <Send className="h-4 w-4 mr-2" />
                         WhatsApp
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setServicoEditando(servico)}
+                        className="bg-slate-900/50 border-slate-700 text-cyan-400 hover:bg-slate-800 hover:border-cyan-500/50 hover:text-cyan-300"
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -233,6 +248,26 @@ export function ListaServicos({ servicos, onUpdateStatus }: ListaServicosProps) 
           )}
         </div>
       </div>
+      <Dialog
+        open={servicoEditando !== null}
+        onOpenChange={(open) => {
+          if (!open) setServicoEditando(null)
+        }}
+      >
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto border-slate-700 bg-slate-950 p-0">
+          {servicoEditando && (
+            <ServicoForm
+              key={servicoEditando.id}
+              initialData={servicoEditando}
+              onCancel={() => setServicoEditando(null)}
+              onSubmit={(dados) => {
+                onUpdate(servicoEditando.id, dados)
+                setServicoEditando(null)
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -25,17 +25,30 @@ interface OrcamentoFormProps {
     descricao: string
     itens: Item[]
     total: number
-    status: "pendente"
+    status: "pendente" | "aprovado" | "rejeitado"
   }) => void
+  initialData?: {
+    cliente: string
+    telefone: string
+    email: string
+    endereco: string
+    descricao: string
+    itens: Item[]
+    total: number
+    status: "pendente" | "aprovado" | "rejeitado"
+  }
+  onCancel?: () => void
 }
 
-export function OrcamentoForm({ onSubmit }: OrcamentoFormProps) {
-  const [cliente, setCliente] = useState("")
-  const [telefone, setTelefone] = useState("")
-  const [email, setEmail] = useState("")
-  const [endereco, setEndereco] = useState("")
-  const [descricao, setDescricao] = useState("")
-  const [itens, setItens] = useState<Item[]>([{ descricao: "", quantidade: 1, valor: 0 }])
+export function OrcamentoForm({ onSubmit, initialData, onCancel }: OrcamentoFormProps) {
+  const [cliente, setCliente] = useState(initialData?.cliente ?? "")
+  const [telefone, setTelefone] = useState(initialData?.telefone ?? "")
+  const [email, setEmail] = useState(initialData?.email ?? "")
+  const [endereco, setEndereco] = useState(initialData?.endereco ?? "")
+  const [descricao, setDescricao] = useState(initialData?.descricao ?? "")
+  const [itens, setItens] = useState<Item[]>(
+    initialData?.itens.length ? initialData.itens : [{ descricao: "", quantidade: 1, valor: 0 }],
+  )
 
   const adicionarItem = () => {
     setItens([...itens, { descricao: "", quantidade: 1, valor: 0 }])
@@ -75,8 +88,13 @@ export function OrcamentoForm({ onSubmit }: OrcamentoFormProps) {
       descricao,
       itens: itens.filter((item) => item.descricao.trim() !== ""),
       total,
-      status: "pendente",
+      status: initialData?.status ?? "pendente",
     })
+
+    if (initialData) {
+      alert("Orçamento atualizado com sucesso!")
+      return
+    }
 
     // Limpar formulário
     setCliente("")
@@ -173,8 +191,12 @@ export function OrcamentoForm({ onSubmit }: OrcamentoFormProps) {
       <div className="relative z-10 p-6 max-w-4xl mx-auto">
         <Card className="card-futuristic border-0">
           <CardHeader>
-            <CardTitle className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Novo Orçamento</CardTitle>
-            <CardDescription className="text-slate-400">Crie um novo orçamento para seus clientes</CardDescription>
+            <CardTitle className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              {initialData ? "Editar Orçamento" : "Novo Orçamento"}
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              {initialData ? "Atualize os dados deste orçamento" : "Crie um novo orçamento para seus clientes"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -307,9 +329,16 @@ export function OrcamentoForm({ onSubmit }: OrcamentoFormProps) {
             </span>
           </div>
 
-          <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" size="lg">
-            Criar Orçamento
-          </Button>
+          <div className={onCancel ? "flex gap-3" : ""}>
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+                Cancelar
+              </Button>
+            )}
+            <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" size="lg">
+              {initialData ? "Salvar Alterações" : "Criar Orçamento"}
+            </Button>
+          </div>
         </form>
           </CardContent>
         </Card>
