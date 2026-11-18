@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { dataAtualISO } from "../utils/date-utils"
 
 interface ServicoData {
   cliente: string
@@ -17,6 +18,7 @@ interface ServicoData {
   status: "agendado" | "em_andamento" | "concluido" | "cancelado"
   valor: number
   tecnico: string
+  dataServico?: string
   dataConclusao?: string
 }
 
@@ -33,6 +35,9 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
   const [descricao, setDescricao] = useState(initialData?.descricao ?? "")
   const [valor, setValor] = useState(initialData?.valor ?? 0)
   const [tecnico, setTecnico] = useState(initialData?.tecnico ?? "")
+  const [dataServico, setDataServico] = useState(
+    initialData ? initialData.dataServico ?? "" : dataAtualISO(),
+  )
   const [dataConclusao, setDataConclusao] = useState(initialData?.dataConclusao ?? "")
 
   const resetForm = () => {
@@ -42,6 +47,7 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
     setDescricao("")
     setValor(0)
     setTecnico("")
+    setDataServico(dataAtualISO())
     setDataConclusao("")
   }
 
@@ -53,6 +59,11 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
       return
     }
 
+    if (!initialData && !dataServico) {
+      alert("Por favor, informe a data do serviço")
+      return
+    }
+
     onSubmit({
       cliente,
       telefone,
@@ -61,6 +72,7 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
       status: initialData?.status ?? "agendado",
       valor,
       tecnico,
+      dataServico: dataServico || undefined,
       dataConclusao:
         initialData?.status === "concluido" && dataConclusao
           ? dataConclusao
@@ -203,6 +215,23 @@ export function ServicoForm({ onSubmit, initialData, onCancel }: ServicoFormProp
               className="bg-slate-900/50 border-slate-700 text-white placeholder-slate-500"
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dataServico" className="text-slate-300">Data do serviço *</Label>
+            <Input
+              id="dataServico"
+              type="date"
+              value={dataServico}
+              onChange={(e) => setDataServico(e.target.value)}
+              className="bg-slate-900/50 border-slate-700 text-white"
+              required={!initialData}
+            />
+            <p className="text-xs text-slate-400">
+              {initialData
+                ? "Data em que o atendimento foi ou será realizado."
+                : "Selecione a data em que o atendimento será realizado."}
+            </p>
           </div>
 
           <div className="space-y-2">

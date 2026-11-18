@@ -20,6 +20,7 @@ interface Servico {
   descricao: string
   status: "agendado" | "em_andamento" | "concluido" | "cancelado"
   data: string
+  dataServico?: string
   dataConclusao?: string
   valor: number
   tecnico: string
@@ -167,8 +168,9 @@ export function ListaServicos({ servicos, onUpdateStatus, onUpdate }: ListaServi
                     <div>
                       <h2 className="text-xl font-bold text-white">{servico.cliente}</h2>
                       <p className="text-slate-400 text-sm">
-                        {servico.telefone} • {servico.data}
+                        {servico.telefone} • Serviço: {formatarData(servico.dataServico) ?? "Data não informada"}
                       </p>
+                      <p className="text-slate-500 text-xs">Cadastrado em: {servico.data}</p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                       servico.status === "concluido" ? "bg-green-500/20 border-green-500/50 text-green-300" :
