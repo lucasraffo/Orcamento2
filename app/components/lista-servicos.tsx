@@ -264,15 +264,17 @@ export function ListaServicos({ servicos, onUpdateStatus, onUpdate, onDelete }: 
                         <Pencil className="h-4 w-4 mr-2" />
                         Editar
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleExcluir(servico)}
-                        className="bg-red-600/20 border-red-500/50 text-red-300 hover:bg-red-600/40 hover:text-red-200"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Excluir
-                      </Button>
+                      {servico.status === "cancelado" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleExcluir(servico)}
+                          className="bg-red-600/20 border-red-500/50 text-red-300 hover:bg-red-600/40 hover:text-red-200"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Excluir
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
