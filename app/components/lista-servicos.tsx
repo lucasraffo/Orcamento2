@@ -171,7 +171,7 @@ export function ListaServicos({ servicos, onUpdateStatus, onDelete }: ListaServi
                     <div>
                       <h2 className="text-xl font-bold text-white">{servico.cliente}</h2>
                       <p className="text-slate-400 text-sm">
-                        {servico.telefone} • {servico.data}
+                        {[servico.telefone, servico.data].filter(Boolean).join(" • ")}
                       </p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${

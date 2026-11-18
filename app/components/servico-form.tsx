@@ -43,14 +43,8 @@ export function ServicoForm({ onSubmit }: ServicoFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!cliente || !telefone || !endereco || !descricao || !tecnico) {
+    if (!cliente || !endereco || !descricao || !tecnico) {
       alert("Por favor, preencha todos os campos obrigatórios")
-      return
-    }
-
-    const phoneRegex = /^\([1-9]{2}\) (?:[2-8]|9[0-9])[0-9]{3}\-[0-9]{4}$/
-    if (!phoneRegex.test(telefone)) {
-      alert("Telefone inválido. Use o formato (47) 99999-9999")
       return
     }
 
@@ -170,14 +164,13 @@ export function ServicoForm({ onSubmit }: ServicoFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="telefone" className="text-slate-300">Telefone *</Label>
+              <Label htmlFor="telefone" className="text-slate-300">Telefone</Label>
               <Input
                 id="telefone"
                 value={telefone}
                 onChange={(e) => setTelefone(e.target.value)}
                 placeholder="(47) 99999-9999"
                 className="bg-slate-900/50 border-slate-700 text-white placeholder-slate-500"
-                required
               />
             </div>
           </div>

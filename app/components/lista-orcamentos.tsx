@@ -176,7 +176,7 @@ export function ListaOrcamentos({ orcamentos, onUpdateStatus, onDelete }: ListaO
                     <div>
                       <h2 className="text-xl font-bold text-white">{orcamento.cliente}</h2>
                       <p className="text-slate-400 text-sm">
-                        {orcamento.telefone} • {orcamento.data}
+                        {[orcamento.telefone, orcamento.data].filter(Boolean).join(" • ")}
                       </p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${
