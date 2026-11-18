@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Wrench, ShieldCheck, Send, Pencil } from "lucide-react"
+import { Wrench, ShieldCheck, Send, Pencil, Trash2 } from "lucide-react"
 import { gerarGarantiaPDF } from "../utils/pdf-generator"
 import { enviarWhatsAppGarantia } from "../utils/whatsapp"
 import { formatarData, somarDiasAData } from "../utils/date-utils"
@@ -30,10 +30,17 @@ interface ListaServicosProps {
   servicos: Servico[]
   onUpdateStatus: (id: string, status: Servico["status"]) => void
   onUpdate: (id: string, servico: Omit<Servico, "id" | "data">) => void
+  onDelete: (id: string) => void
 }
 
-export function ListaServicos({ servicos, onUpdateStatus, onUpdate }: ListaServicosProps) {
+export function ListaServicos({ servicos, onUpdateStatus, onUpdate, onDelete }: ListaServicosProps) {
   const [servicoEditando, setServicoEditando] = useState<Servico | null>(null)
+
+  const handleExcluir = (servico: Servico) => {
+    if (window.confirm(`Deseja excluir o serviço de ${servico.cliente}?`)) {
+      onDelete(servico.id)
+    }
+  }
 
   const handleGerarGarantiaPDF = async (servico: Servico) => {
     try {
@@ -256,6 +263,15 @@ export function ListaServicos({ servicos, onUpdateStatus, onUpdate }: ListaServi
                       >
                         <Pencil className="h-4 w-4 mr-2" />
                         Editar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleExcluir(servico)}
+                        className="bg-red-600/20 border-red-500/50 text-red-300 hover:bg-red-600/40 hover:text-red-200"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
                       </Button>
                     </div>
                   </div>
