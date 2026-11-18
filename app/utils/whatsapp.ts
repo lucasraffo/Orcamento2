@@ -1,3 +1,6 @@
+export const numeroWhatsAppRaffo = "5547996960063"
+export const telefoneContatoRaffo = "(47) 99696-0063"
+
 interface Orcamento {
   id: string
   cliente: string
@@ -16,8 +19,6 @@ interface Orcamento {
 }
 
 export function enviarWhatsApp(orcamento: Orcamento) {
-  const numeroWhatsApp = "5547996960063" // Número da Raffo Refrigeração
-
   // Criar mensagem formatada
   const mensagem = `
 🧊 *RAFFO REFRIGERAÇÃO* 🧊
@@ -63,7 +64,7 @@ Status: ${orcamento.status.toUpperCase()}
   const mensagemCodificada = encodeURIComponent(mensagem)
 
   // Criar URL do WhatsApp
-  const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`
+  const urlWhatsApp = `https://wa.me/${numeroWhatsAppRaffo}?text=${mensagemCodificada}`
 
   // Abrir WhatsApp
   window.open(urlWhatsApp, "_blank")
@@ -82,8 +83,6 @@ interface Servico {
 }
 
 export function enviarWhatsAppGarantia(servico: Servico) {
-  const numeroWhatsApp = "5547996960063"
-
   const mensagem = `
 🧊 *RAFFO REFRIGERAÇÃO* 🧊
 CNPJ: 27.966.710/0001-27
@@ -109,7 +108,7 @@ Obrigado por confiar na Raffo Refrigeração!
   `.trim()
 
   const mensagemCodificada = encodeURIComponent(mensagem)
-  const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`
+  const urlWhatsApp = `https://wa.me/${numeroWhatsAppRaffo}?text=${mensagemCodificada}`
 
   window.open(urlWhatsApp, "_blank")
 }
