@@ -94,6 +94,28 @@ export default function Dashboard() {
     localStorage.setItem("servicos", JSON.stringify(novosServicos))
   }
 
+  const atualizarOrcamento = (id: string, dados: Omit<Orcamento, "id" | "data">) => {
+    const novosOrcamentos = orcamentos.map((orcamento) =>
+      orcamento.id === id ? { ...orcamento, ...dados } : orcamento,
+    )
+    setOrcamentos(novosOrcamentos)
+    localStorage.setItem("orcamentos", JSON.stringify(novosOrcamentos))
+  }
+
+  const excluirOrcamento = (id: string) => {
+    const novosOrcamentos = orcamentos.filter((orcamento) => orcamento.id !== id)
+    setOrcamentos(novosOrcamentos)
+    localStorage.setItem("orcamentos", JSON.stringify(novosOrcamentos))
+  }
+
+  const atualizarServico = (id: string, dados: Omit<Servico, "id" | "data">) => {
+    const novosServicos = servicos.map((servico) =>
+      servico.id === id ? { ...servico, ...dados } : servico,
+    )
+    setServicos(novosServicos)
+    localStorage.setItem("servicos", JSON.stringify(novosServicos))
+  }
+
   const totalOrcamentos = orcamentos.reduce((acc, orc) => acc + orc.total, 0)
   const totalServicos = servicos.reduce((acc, serv) => acc + serv.valor, 0)
 
@@ -279,7 +301,12 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="orcamentos">
-            <ListaOrcamentos orcamentos={orcamentos} onUpdateStatus={atualizarStatusOrcamento} />
+            <ListaOrcamentos
+              orcamentos={orcamentos}
+              onUpdateStatus={atualizarStatusOrcamento}
+              onUpdate={atualizarOrcamento}
+              onDelete={excluirOrcamento}
+            />
           </TabsContent>
 
           <TabsContent value="novo-servico">
@@ -287,7 +314,11 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="servicos">
-            <ListaServicos servicos={servicos} onUpdateStatus={atualizarStatusServico} />
+            <ListaServicos
+              servicos={servicos}
+              onUpdateStatus={atualizarStatusServico}
+              onUpdate={atualizarServico}
+            />
           </TabsContent>
         </Tabs>
       </div>
