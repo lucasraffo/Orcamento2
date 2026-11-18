@@ -4,20 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FileText, Send, Download, Trash2 } from "lucide-react"
+import { FileText, Send, Download } from "lucide-react"
 import { gerarPDF } from "../utils/pdf-generator"
 import { enviarWhatsApp } from "../utils/whatsapp"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 
 interface Orcamento {
   id: string
@@ -39,10 +28,9 @@ interface Orcamento {
 interface ListaOrcamentosProps {
   orcamentos: Orcamento[]
   onUpdateStatus: (id: string, status: Orcamento["status"]) => void
-  onDelete: (id: string) => void
 }
 
-export function ListaOrcamentos({ orcamentos, onUpdateStatus, onDelete }: ListaOrcamentosProps) {
+export function ListaOrcamentos({ orcamentos, onUpdateStatus }: ListaOrcamentosProps) {
   const handleGerarPDF = async (orcamento: Orcamento) => {
     try {
       await gerarPDF(orcamento)
@@ -176,7 +164,7 @@ export function ListaOrcamentos({ orcamentos, onUpdateStatus, onDelete }: ListaO
                     <div>
                       <h2 className="text-xl font-bold text-white">{orcamento.cliente}</h2>
                       <p className="text-slate-400 text-sm">
-                        {[orcamento.telefone, orcamento.data].filter(Boolean).join(" • ")}
+                        {orcamento.telefone} • {orcamento.data}
                       </p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${
@@ -259,37 +247,6 @@ export function ListaOrcamentos({ orcamentos, onUpdateStatus, onDelete }: ListaO
                         <Send className="h-4 w-4 mr-2" />
                         WhatsApp
                       </Button>
-                      {orcamento.status === "rejeitado" && (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              aria-label={`Excluir orçamento de ${orcamento.cliente}`}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Excluir
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Excluir orçamento?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                O orçamento de {orcamento.cliente} será removido permanentemente. Essa ação não pode ser desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => onDelete(orcamento.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Excluir orçamento
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      )}
                     </div>
                   </div>
                 </div>
