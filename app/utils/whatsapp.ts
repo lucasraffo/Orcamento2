@@ -28,7 +28,7 @@ CNPJ: 27.966.710/0001-27
 
 👤 *CLIENTE:*
 Nome: ${orcamento.cliente}
-Telefone: ${orcamento.telefone}
+${orcamento.telefone ? `Telefone: ${orcamento.telefone}\n` : ""}
 ${orcamento.email ? `Email: ${orcamento.email}` : ""}
 Endereço: ${orcamento.endereco}
 
@@ -93,7 +93,7 @@ CNPJ: 27.966.710/0001-27
 
 👤 *CLIENTE:*
 Nome: ${servico.cliente}
-Telefone: ${servico.telefone}
+${servico.telefone ? `Telefone: ${servico.telefone}\n` : ""}
 Endereço: ${servico.endereco}
 
 🛠️ *SERVIÇO REALIZADO:*

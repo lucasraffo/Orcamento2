@@ -134,9 +134,7 @@ export async function gerarPDF(orcamento: Orcamento) {
           <div class="info-line">
             <span class="info-label">Nome:</span> ${orcamento.cliente}
           </div>
-          <div class="info-line">
-            <span class="info-label">Telefone:</span> ${orcamento.telefone}
-          </div>
+          ${orcamento.telefone ? `<div class="info-line"><span class="info-label">Telefone:</span> ${orcamento.telefone}</div>` : ""}
           <div class="info-line">
             <span class="info-label">Email:</span> ${orcamento.email || "Não informado"}
           </div>
@@ -318,7 +316,7 @@ export async function gerarGarantiaPDF(servico: Servico) {
 
       <div class="section-title">DADOS DO CLIENTE</div>
       <div class="info-line"><span class="info-label">Nome:</span> ${servico.cliente}</div>
-      <div class="info-line"><span class="info-label">Telefone:</span> ${servico.telefone}</div>
+      ${servico.telefone ? `<div class="info-line"><span class="info-label">Telefone:</span> ${servico.telefone}</div>` : ""}
       <div class="info-line"><span class="info-label">Endereço:</span> ${servico.endereco}</div>
       <div class="info-line"><span class="info-label">Técnico:</span> ${servico.tecnico}</div>
       <div class="info-line"><span class="info-label">Data:</span> ${servico.data}</div>
