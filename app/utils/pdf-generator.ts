@@ -1,4 +1,5 @@
 import { telefoneContatoRaffo } from "./whatsapp"
+import { formatarData, somarDiasAData } from "./date-utils"
 
 interface Orcamento {
   id: string
@@ -151,7 +152,7 @@ export async function gerarPDF(orcamento: Orcamento) {
             <span class="info-label">Número:</span> #${orcamento.id}
           </div>
           <div class="info-line">
-            <span class="info-label">Data:</span> ${orcamento.data}
+            <span class="info-label">Criado em:</span> ${orcamento.data}
           </div>
           <div class="info-line">
             <span class="info-label">Status:</span> ${orcamento.status.toUpperCase()}
@@ -202,7 +203,7 @@ export async function gerarPDF(orcamento: Orcamento) {
       </div>
 
       <div class="footer">
-        <p>Este orçamento tem validade de 30 dias a partir da data de emissão.</p>
+        <p>Este orçamento foi criado em ${orcamento.data}. Os valores são válidos por 7 dias; após esse prazo, poderão sofrer alteração.</p>
         <p>Raffo Refrigeração - Soluções em Refrigeração e Climatização</p>
       </div>
     </body>
@@ -243,6 +244,7 @@ interface Servico {
   descricao: string
   status: string
   data: string
+  dataConclusao?: string
   valor: number
   tecnico: string
 }
@@ -268,6 +270,11 @@ export async function gerarGarantiaPDF(servico: Servico) {
   const descricao = escaparHtml(servico.descricao)
   const tecnico = escaparHtml(servico.tecnico)
   const data = escaparHtml(servico.data)
+  const dataConclusao =
+    servico.status === "concluido" ? formatarData(servico.dataConclusao) : null
+  const fimGarantia = dataConclusao
+    ? formatarData(somarDiasAData(servico.dataConclusao, 90))
+    : null
   const status = escaparHtml(servico.status.replace("_", " ").toUpperCase())
   const numeroServico = escaparHtml(servico.id)
   const telefoneEmpresa = escaparHtml(telefoneContatoRaffo)
@@ -558,6 +565,14 @@ export async function gerarGarantiaPDF(servico: Servico) {
               <span class="detail-label">Data registrada</span>
               <strong class="detail-value">${data}</strong>
             </div>
+            ${
+              dataConclusao
+                ? `<div>
+                    <span class="detail-label">Serviço concluído em</span>
+                    <strong class="detail-value">${escaparHtml(dataConclusao)}</strong>
+                  </div>`
+                : ""
+            }
           </div>
         </section>
 
@@ -578,9 +593,18 @@ export async function gerarGarantiaPDF(servico: Servico) {
           <h2 class="section-title">Termo de garantia</h2>
           <div class="terms">
             <p>
-              Este serviço possui garantia técnica de <strong>90 dias a partir da data de conclusão</strong>.
+              Este serviço possui garantia técnica de <strong>90 dias a partir da data de conclusão</strong>${
+                fimGarantia
+                  ? `, com previsão de término em <strong>${escaparHtml(fimGarantia)}</strong>`
+                  : ""
+              }.
               A garantia cobre falhas decorrentes da execução do serviço e materiais fornecidos pela Raffo Refrigeração.
             </p>
+            ${
+              dataConclusao
+                ? ""
+                : `<p><strong>A data de conclusão ainda não foi informada.</strong> Edite o serviço para registrar a data e calcular o término da garantia.</p>`
+            }
             <p>
               Para acionar a garantia, entre em contato com a Raffo Refrigeração pelo WhatsApp
               <span class="contact">${telefoneEmpresa}</span> e informe o número do serviço

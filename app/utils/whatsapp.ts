@@ -1,3 +1,5 @@
+import { formatarData, somarDiasAData } from "./date-utils"
+
 export const numeroWhatsAppRaffo = "5547996960063"
 export const telefoneContatoRaffo = "(47) 99696-0063"
 
@@ -25,7 +27,7 @@ export function enviarWhatsApp(orcamento: Orcamento) {
 CNPJ: 27.966.710/0001-27
 
 📋 *ORÇAMENTO #${orcamento.id}*
-📅 Data: ${orcamento.data}
+📅 Criado em: ${orcamento.data}
 
 👤 *CLIENTE:*
 Nome: ${orcamento.cliente}
@@ -55,7 +57,7 @@ ${orcamento.itens
 Status: ${orcamento.status.toUpperCase()}
 
 ---
-✅ Orçamento válido por 30 dias
+✅ Valores válidos por 7 dias a partir da criação; após esse prazo, poderão sofrer alteração.
 🔧 Especialistas em Refrigeração e Climatização
 📞 Entre em contato para mais informações!
   `.trim()
@@ -80,15 +82,19 @@ interface Servico {
   data: string
   valor: number
   tecnico: string
+  dataConclusao?: string
 }
 
 export function enviarWhatsAppGarantia(servico: Servico) {
+  const dataConclusao = formatarData(servico.dataConclusao)
+  const fimGarantia = formatarData(somarDiasAData(servico.dataConclusao, 90))
   const mensagem = `
 🧊 *RAFFO REFRIGERAÇÃO* 🧊
 CNPJ: 27.966.710/0001-27
 
 🛡️ *GARANTIA DO SERVIÇO #${servico.id}*
 📅 Data: ${servico.data}
+${dataConclusao ? `✅ Serviço concluído em: ${dataConclusao}\n🛡️ Garantia até: ${fimGarantia}\n` : ""}
 
 👤 *CLIENTE:*
 Nome: ${servico.cliente}
