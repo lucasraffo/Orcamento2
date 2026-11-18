@@ -94,18 +94,6 @@ export default function Dashboard() {
     localStorage.setItem("servicos", JSON.stringify(novosServicos))
   }
 
-  const excluirOrcamento = (id: string) => {
-    const novosOrcamentos = orcamentos.filter((orcamento) => orcamento.id !== id)
-    setOrcamentos(novosOrcamentos)
-    localStorage.setItem("orcamentos", JSON.stringify(novosOrcamentos))
-  }
-
-  const excluirServico = (id: string) => {
-    const novosServicos = servicos.filter((servico) => servico.id !== id)
-    setServicos(novosServicos)
-    localStorage.setItem("servicos", JSON.stringify(novosServicos))
-  }
-
   const totalOrcamentos = orcamentos.reduce((acc, orc) => acc + orc.total, 0)
   const totalServicos = servicos.reduce((acc, serv) => acc + serv.valor, 0)
 
@@ -291,11 +279,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="orcamentos">
-            <ListaOrcamentos
-              orcamentos={orcamentos}
-              onUpdateStatus={atualizarStatusOrcamento}
-              onDelete={excluirOrcamento}
-            />
+            <ListaOrcamentos orcamentos={orcamentos} onUpdateStatus={atualizarStatusOrcamento} />
           </TabsContent>
 
           <TabsContent value="novo-servico">
@@ -303,11 +287,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="servicos">
-            <ListaServicos
-              servicos={servicos}
-              onUpdateStatus={atualizarStatusServico}
-              onDelete={excluirServico}
-            />
+            <ListaServicos servicos={servicos} onUpdateStatus={atualizarStatusServico} />
           </TabsContent>
         </Tabs>
       </div>
