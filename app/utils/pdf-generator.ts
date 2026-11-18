@@ -464,22 +464,6 @@ export async function gerarGarantiaPDF(servico: Servico) {
           white-space: nowrap;
         }
 
-        .signatures {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 36px;
-          margin-top: 48px;
-          break-inside: avoid;
-        }
-
-        .signature {
-          padding-top: 8px;
-          border-top: 1px solid #8794a5;
-          color: #637187;
-          font-size: 10px;
-          text-align: center;
-        }
-
         .footer {
           margin-top: 28px;
           padding-top: 14px;
@@ -604,11 +588,6 @@ export async function gerarGarantiaPDF(servico: Servico) {
             </p>
           </div>
         </section>
-
-        <div class="signatures">
-          <div class="signature">Assinatura do cliente</div>
-          <div class="signature">Assinatura do técnico responsável</div>
-        </div>
 
         <footer class="footer">
           <p>Raffo Refrigeração · CNPJ 27.966.710/0001-27</p>
