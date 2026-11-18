@@ -9,6 +9,7 @@ import { OrcamentoForm } from "./components/orcamento-form"
 import { ServicoForm } from "./components/servico-form"
 import { ListaOrcamentos } from "./components/lista-orcamentos"
 import { ListaServicos } from "./components/lista-servicos"
+import { dataAtualISO } from "./utils/date-utils"
 
 interface Orcamento {
   id: string
@@ -35,6 +36,8 @@ interface Servico {
   descricao: string
   status: "agendado" | "em_andamento" | "concluido" | "cancelado"
   data: string
+  dataServico?: string
+  dataConclusao?: string
   valor: number
   tecnico: string
 }
@@ -89,7 +92,18 @@ export default function Dashboard() {
   }
 
   const atualizarStatusServico = (id: string, status: Servico["status"]) => {
-    const novosServicos = servicos.map((serv) => (serv.id === id ? { ...serv, status } : serv))
+    const novosServicos = servicos.map((serv) => {
+      if (serv.id !== id) return serv
+
+      return {
+        ...serv,
+        status,
+        dataConclusao:
+          status === "concluido"
+            ? serv.dataConclusao ?? dataAtualISO()
+            : undefined,
+      }
+    })
     setServicos(novosServicos)
     localStorage.setItem("servicos", JSON.stringify(novosServicos))
   }
@@ -112,6 +126,12 @@ export default function Dashboard() {
     const novosServicos = servicos.map((servico) =>
       servico.id === id ? { ...servico, ...dados } : servico,
     )
+    setServicos(novosServicos)
+    localStorage.setItem("servicos", JSON.stringify(novosServicos))
+  }
+
+  const excluirServico = (id: string) => {
+    const novosServicos = servicos.filter((servico) => servico.id !== id)
     setServicos(novosServicos)
     localStorage.setItem("servicos", JSON.stringify(novosServicos))
   }
@@ -318,6 +338,7 @@ export default function Dashboard() {
               servicos={servicos}
               onUpdateStatus={atualizarStatusServico}
               onUpdate={atualizarServico}
+              onDelete={excluirServico}
             />
           </TabsContent>
         </Tabs>
